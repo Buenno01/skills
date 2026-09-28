@@ -1,0 +1,42 @@
+/* Theme: shakers. Poppins only, light surfaces, black text, green (#3DE982) as thin-line/detail accent only.
+   Org rules encoded here: no black backgrounds on content blocks, green never dominant, tight vertical rhythm. */
+@import "../styles/base.css";
+
+:root {
+  --font-family-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: "Geist Mono", ui-monospace, monospace;
+  --radius: 0.375rem;
+  --shakers-green: #3DE982;
+  --background: #FFFFFF;
+  --foreground: #000000;
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+  --popover: #FFFFFF;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4F4F4;
+  --secondary-foreground: #000000;
+  --muted: #F4F4F4;
+  --muted-foreground: #6B6B6B;
+  --accent: #F4F4F4;
+  --accent-foreground: #000000;
+  --destructive: oklch(0.58 0.2 27);
+  --success: #1FA85C;
+  --warning: oklch(0.72 0.16 70);
+  --border: #D5D5D5;
+  --input: #D5D5D5;
+  --ring: #3DE982;
+  --chart-1: #000000;
+  --chart-2: #3DE982;
+  --chart-3: #6B6B6B;
+  --chart-4: #1FA85C;
+  --chart-5: #D5D5D5;
+}
+
+/* Deck-only: black allowed on cover / transition / closing slides via .slide-dark */
+.slide-dark { background: #000000; color: #FFFFFF; --muted-foreground: #B5B5B5; --border: #333333; }
+
+/* Green accent helpers: thin rules and small marks, never fills */
+.accent-rule { border-top: 2px solid var(--shakers-green); }
+.accent-mark { color: var(--shakers-green); }
