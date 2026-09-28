@@ -2,7 +2,7 @@
 // artifact.mjs: single entry point for the artifact kit.
 //   setup                       install/refresh the kit in $ARTIFACT_KIT_HOME (default ~/.artifact-kit)
 //   init <name> --format F [--theme T] [--force]
-//   build <name> --out <file.html> [--no-screenshot]
+//   build <name> --out <file.html> [--theme T] [--no-screenshot]
 //   check                       smoke-build the bundled _example
 //   list                        formats, themes, shells, blocks, ui components
 //   path                        print kit home
@@ -83,11 +83,15 @@ function init() {
   writeFileSync(join(dir, "index.html"), `<!doctype html>\n<html lang="pt-BR"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>${name}</title></head><body><div id="root"></div><script type="module" src="./main.tsx"></script></body></html>\n`);
   writeFileSync(join(dir, "main.tsx"), `import { StrictMode } from "react";\nimport { createRoot } from "react-dom/client";\nimport "@/tokens/${theme}.css";\nimport App from "./App";\ncreateRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);\n`);
   writeFileSync(join(dir, "artifact.json"), JSON.stringify({ name, format, theme, created: new Date().toISOString() }, null, 2));
-  console.log(`OK ${join(dir, "App.tsx")}\nOK ${join(dir, "data.ts")}\nedit those two files, then: build ${name} --out <file.html>`);
+  console.log(`OK ${join(dir, "App.tsx")}\nOK ${join(dir, "data.ts")}\nreplace both with write_file (they are fresh scaffolds: no need to read first; if write_file refuses, delete the file with terminal and write again), then: build ${name} --out <file.html>`);
 }
 
 function tscErrors(name) {
-  const r = nodeBin("typescript/bin/tsc", ["--noEmit", "-p", "tsconfig.json"]);
+  // per-build tsconfig so a broken sibling artifact never fails this one
+  const cfg = join(HOME, "dist", `tsconfig.${name}.json`);
+  mkdirSync(dirname(cfg), { recursive: true });
+  writeFileSync(cfg, JSON.stringify({ extends: "../tsconfig.json", include: ["../src", `../artifacts/${name}`] }));
+  const r = nodeBin("typescript/bin/tsc", ["--noEmit", "-p", cfg]);
   if (r.status === 0) return null;
   const lines = (r.stdout || "").split(/\r?\n/).filter(l => l.includes("error TS"));
   const mine = lines.filter(l => l.includes(`artifacts/${name}/`) || l.includes(`artifacts\\${name}\\`));
@@ -100,6 +104,13 @@ async function build() {
   if (!name || !out) fail("build <name> --out <file.html>");
   const dir = join(HOME, "artifacts", name);
   if (!existsSync(join(dir, "App.tsx"))) fail(`artifacts/${name} not found; run init first`);
+  const theme = flag("theme");
+  if (theme) {
+    if (!themes().includes(theme)) fail(`theme ${theme} not found; available: ${themes().join(", ")}`);
+    const mainP = join(dir, "main.tsx");
+    writeFileSync(mainP, readFileSync(mainP, "utf8").replace(/@\/tokens\/[a-z0-9-]+\.css/, `@/tokens/${theme}.css`));
+    const metaP = join(dir, "artifact.json"); const meta = JSON.parse(readFileSync(metaP, "utf8")); meta.theme = theme; writeFileSync(metaP, JSON.stringify(meta, null, 2));
+  }
   const ts = tscErrors(name);
   if (ts) fail("tsc", ts);
   const b = nodeBin("vite/bin/vite.js", ["build", "--config", "vite.config.ts"], { env: { ARTIFACT: name } });
@@ -148,9 +159,11 @@ async function screenshot(file, name) {
     deckNote = `  slides: ${total} in ${contact}`;
   }
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
+  const clipped = await page.evaluate(() => { const el = document.querySelector("article.page"); return el ? el.scrollHeight - el.clientHeight : 0; });
   await browser.close();
   const parts = [`screenshot: ${shot}` + deckNote, `console: ${errors.length} erro(s)`];
   if (overflow) parts.push("WARN horizontal overflow");
+  if (clipped > 2) parts.push(`WARN vertical overflow: page content clipped by ${clipped}px`);
   if (errors.length) parts.push("\n" + errors.slice(0, 5).map(e => "  " + e).join("\n"));
   return parts.join("  ");
 }

@@ -5,7 +5,7 @@ import { page } from "./data";
 
 export default function App() {
   return (
-    <PageShell title={page.title}>
+    <PageShell title={page.title} className="gap-4 leading-snug">
       <header>
         <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground font-medium">{page.kicker}</p>
         <h1 className="text-[26pt] font-semibold tracking-tight leading-tight mt-1">{page.title}</h1>
@@ -15,7 +15,7 @@ export default function App() {
       <section className="grid grid-cols-2 gap-6">
         {page.blocks.map((b, i) => <div key={i}><h2 className="font-semibold mb-1">{b.title}</h2><p className="text-[10.5pt]">{b.text}</p></div>)}
       </section>
-      <StatRow className="mt-auto">{page.stats.map((s, i) => <Stat key={i} value={s.value} label={s.label} className="[&>div:first-child]:text-[22pt]" />)}</StatRow>
+      <StatRow className="mt-auto">{page.stats.map((s, i) => <Stat key={i} size="page" value={s.value} label={s.label} />)}</StatRow>
       <footer className="text-xs text-muted-foreground">{page.footer}</footer>
     </PageShell>
   );

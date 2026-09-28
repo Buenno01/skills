@@ -4,19 +4,19 @@ import { cn } from "@/lib/utils";
 
 const colors = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 type Series = { key: string; label?: string; color?: string };
-type Common = { data: Record<string, any>[]; x: string; series: Series[]; height?: number; className?: string; format?: (v: number) => string; legend?: boolean; stacked?: boolean };
+type Common = { data: Record<string, any>[]; x: string; series: Series[]; height?: number; className?: string; format?: (v: number) => string; legend?: boolean; stacked?: boolean; xInterval?: number | "preserveStartEnd" | "preserveEnd" };
 
 const axis = { tick: { fontSize: 12, fill: "var(--muted-foreground)" }, axisLine: false, tickLine: false } as const;
 const tip = { contentStyle: { background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12, color: "var(--foreground)" }, cursor: { fill: "var(--muted)" } };
 
 /** Themed recharts wrappers. kind: line | bar | area | pie. Colors follow --chart-N tokens. */
-export function Chart({ kind, data, x, series, height = 260, className, format, legend, stacked }: Common & { kind: "line" | "bar" | "area" }) {
+export function Chart({ kind, data, x, series, height = 260, className, format, legend, stacked, xInterval = "preserveStartEnd" }: Common & { kind: "line" | "bar" | "area" }) {
   const fmt = format ?? ((v: number) => String(v));
-  const common = { data, margin: { top: 8, right: 12, left: 4, bottom: 0 } };
+  const common = { data, margin: { top: 8, right: 20, left: 4, bottom: 0 } };
   const parts = (
     <>
       <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="0" />
-      <XAxis dataKey={x} {...axis} />
+      <XAxis dataKey={x} {...axis} interval={xInterval} tickMargin={6} />
       <YAxis {...axis} tickFormatter={fmt} width={56} tickMargin={4} />
       <Tooltip {...tip} formatter={(v: any) => fmt(Number(v))} />
       {legend && <Legend wrapperStyle={{ fontSize: 12 }} />}

@@ -35,7 +35,7 @@
 }
 
 /* Deck-only: black allowed on cover / transition / closing slides via .slide-dark */
-.slide-dark { background: #000000; color: #FFFFFF; --muted-foreground: #B5B5B5; --border: #333333; }
+.slide-dark { background: #000000; color: #FFFFFF; --muted-foreground: #B5B5B5; --border: #333333; --primary: #FFFFFF; }
 
 /* Green accent helpers: thin rules and small marks, never fills */
 .accent-rule { border-top: 2px solid var(--shakers-green); }

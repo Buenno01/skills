@@ -1,12 +1,12 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-/** Big number + label. size="deck" scales for the 1920x1080 canvas. Use sparingly (max 3 or 4 per view). */
-export function Stat({ value, label, size = "default", className }: { value: React.ReactNode; label: string; size?: "default" | "deck"; className?: string }) {
-  const deck = size === "deck";
+/** Big number + label. size="deck" scales for the 1920x1080 canvas, size="page" for printed one-pagers. Use sparingly (max 3 or 4 per view). */
+export function Stat({ value, label, size = "default", className }: { value: React.ReactNode; label: string; size?: "default" | "deck" | "page"; className?: string }) {
+  const deck = size === "deck"; const page = size === "page";
   return (
     <div className={cn("flex flex-col", deck ? "gap-3" : "gap-1", className)}>
-      <div className={cn("font-semibold tracking-tight tabular-nums", deck ? "text-[112px] leading-none" : "text-4xl")}>{value}</div>
-      <div className={cn("text-muted-foreground", deck ? "text-[26px]" : "text-sm")}>{label}</div>
+      <div className={cn("font-semibold tracking-tight tabular-nums", deck ? "text-[112px] leading-none" : page ? "text-[20pt] leading-none" : "text-4xl")}>{value}</div>
+      <div className={cn("text-muted-foreground", deck ? "text-[26px]" : page ? "text-[9pt]" : "text-sm")}>{label}</div>
     </div>
   );
 }

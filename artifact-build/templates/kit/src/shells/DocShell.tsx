@@ -11,7 +11,13 @@ const Ctx = React.createContext<{ register: (s: Section) => void }>({ register: 
 export function DocShell({ title, subtitle, meta, children, className }: { title: string; subtitle?: string; meta?: React.ReactNode; children: React.ReactNode; className?: string }) {
   const [sections, setSections] = React.useState<Section[]>([]);
   const [active, setActive] = React.useState<string>("");
-  const register = React.useCallback((s: Section) => setSections(p => p.some(x => x.id === s.id) ? p : [...p, s]), []);
+  const register = React.useCallback((s: Section) => setSections(p => {
+    if (p.some(x => x.id === s.id)) return p;
+    const next = [...p, s];
+    // order by DOM position so nested level-3 sections follow their parent
+    const order = Array.from(document.querySelectorAll("main section[id]")).map(e => e.id);
+    return next.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  }), []);
   React.useEffect(() => { document.title = title; }, [title]);
   React.useEffect(() => {
     const els = sections.map(s => document.getElementById(s.id)).filter(Boolean) as HTMLElement[];
@@ -37,7 +43,7 @@ export function DocShell({ title, subtitle, meta, children, className }: { title
               ))}
             </div>
           </nav>
-          <main className="doc-body min-w-0 max-w-[72ch] space-y-12 text-[15px] leading-7 [&_p]:my-3 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1 [&_strong]:font-semibold [&_table]:my-4">{children}</main>
+          <main className="doc-body min-w-0 max-w-[72ch] space-y-12 text-[15px] leading-7 [&_p]:my-3 [&_ul:not([data-block])]:my-3 [&_ul:not([data-block])]:list-disc [&_ul:not([data-block])]:pl-6 [&_ol:not([data-block])]:my-3 [&_ol:not([data-block])]:list-decimal [&_ol:not([data-block])]:pl-6 [&_:is(ul,ol):not([data-block])>li]:my-1 [&_strong]:font-semibold [&_table]:my-4 [&>section+section[data-level='3']]:-mt-6">{children}</main>
         </div>
       </div>
     </Ctx.Provider>
@@ -49,7 +55,7 @@ export function DocSection({ id, title, level = 2, children, className }: { id: 
   React.useEffect(() => register({ id, title, level }), [id, title, level, register]);
   const H = level === 2 ? "h2" : "h3";
   return (
-    <section id={id} className={cn("scroll-mt-8 print:break-inside-avoid", className)}>
+    <section id={id} data-level={level} className={cn("scroll-mt-8 print:break-inside-avoid", level === 3 && "mt-6", className)}>
       <H className={cn("font-semibold tracking-tight mb-3", level === 2 ? "text-2xl" : "text-lg")}>{title}</H>
       {children}
     </section>

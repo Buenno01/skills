@@ -48,6 +48,15 @@ input, textarea, label, select (`Select, SelectTrigger, SelectValue, SelectConte
 `cn(...classes)` merge Tailwind classes. `fmt.int(n)`, `fmt.money(n, "BRL")`, `fmt.pct(0.12, digits)`, `fmt.compact(n)` all pt-BR by default.
 Theme classes: `.accent-rule` (2px green top border), `.accent-mark` (green text), `.slide-dark` (applied by `<Slide dark>`), `.no-print` (hidden when printing).
 
+## Gotchas (each cost a rebuild once)
+- `SelectTrigger` is `w-fit`: in forms pass `className="w-full"` (or `w-[180px]` in headers).
+- `Checkbox onCheckedChange` gives `boolean | "indeterminate"`: compare `v === true`.
+- `DataTable` right-aligns only real numbers; string cells like `"9 meses"` need `align: "right"`.
+- `fmt.pct(x)` defaults to 0 digits (1.4% prints `1%`): pass `fmt.pct(x, 1)` for small rates.
+- `Button size="touch"` (44px) for mobile prototypes; `Stat size="deck"|"page"` for decks and one-pagers.
+- Chart at 1920x1080 (deck): wrap in a div with `style={{ zoom: 2 }}` and halve `height`, or the 12px ticks are unreadable.
+- Theme is baked into `main.tsx` at `init`; to switch, `build <name> --theme <t>`.
+
 ## Rules that cause build failures
 - Import only from the paths above; `@/ui/Button` (capitalized) does not exist, files are lowercase.
 - `columns` for DataTable must be typed: `as Column<Row>[]` or declare `const columns: Column<Row>[] = [...]`.

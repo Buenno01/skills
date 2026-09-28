@@ -53,6 +53,11 @@
   }
 }
 
+/* Accent helpers and dark slide: defined for every theme, themes may override */
+.accent-rule { border-top: 2px solid var(--primary); }
+.accent-mark { color: var(--primary); }
+.slide-dark { background: oklch(0.17 0.008 60); color: oklch(0.95 0.005 80); --muted-foreground: oklch(0.7 0.01 60); --border: oklch(0.32 0.008 60); --primary: oklch(0.9 0.02 250); }
+
 /* Print: white background, no shadows, keep colors */
 @media print {
   html, body { background: #fff !important; }

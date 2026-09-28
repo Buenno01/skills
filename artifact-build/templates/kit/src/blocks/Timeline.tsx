@@ -5,7 +5,7 @@ export type TimelineItem = { when: string; title: string; description?: React.Re
 /** Vertical timeline. Status controls the dot: done (filled), current (ring), todo (hollow). */
 export function Timeline({ items, className }: { items: TimelineItem[]; className?: string }) {
   return (
-    <ol className={cn("relative border-l ml-2 space-y-6", className)}>
+    <ol data-block className={cn("relative border-l ml-2 space-y-6 list-none pl-0", className)}>
       {items.map((it, i) => (
         <li key={i} className="pl-6 relative">
           <span className={cn("absolute -left-[5px] top-1.5 size-2.5 rounded-full border bg-background",

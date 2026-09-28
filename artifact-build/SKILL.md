@@ -32,19 +32,19 @@ All commands: `terminal(command="node <skill_dir>/scripts/artifact.mjs <cmd> ...
 ```
 setup [--no-browser]                       install or refresh kit in ~/.artifact-kit (idempotent, safe to rerun)
 init <name> --format <fmt> [--theme <t>] [--force]   scaffold artifacts/<name>/{App.tsx,data.ts}
-build <name> --out <abs path.html> [--no-screenshot]  tsc -> vite -> singlefile -> screenshot + console check
+build <name> --out <abs path.html> [--theme <t>] [--no-screenshot]  tsc -> vite -> singlefile -> screenshot + console check
 check                                      smoke-build the bundled _example
 list                                       formats, themes, shells, blocks, ui, existing artifacts
 path                                       print kit home
 ```
 Formats: deck, doc, dashboard, prototype, tool, board, onepager. Themes: neutral (default), shakers.
 
-Output contract: first stdout line starts with `OK` or `FAIL`. `FAIL tsc` is followed by at most 30 `artifacts/<name>/App.tsx(line,col): error TS...` lines. `OK <path> <size>KB  screenshot: <png>  console: N erro(s)` on success; decks also list a per-slide PNG folder. `WARN horizontal overflow` means something is wider than the viewport.
+Output contract: first stdout line starts with `OK` or `FAIL`. `FAIL tsc` is followed by at most 30 `artifacts/<name>/App.tsx(line,col): error TS...` lines. `OK <path> <size>KB  screenshot: <png>  console: N erro(s)` on success; decks also list a per-slide PNG folder. `WARN horizontal overflow` means something is wider than the viewport; `WARN vertical overflow` (onepager) means the page clipped content.
 
 ## Procedure
 1. `setup` once per machine (or whenever `list` says "not installed"). Done when it prints `OK kit`.
 2. `init <name> --format <fmt> --theme <t>`. Name is kebab-case. Done when both `OK` paths print. Read `references/components.md` (API of shells/blocks/ui) before editing.
-3. Edit only `App.tsx` and `data.ts` with `write_file`/`patch`. Content and numbers live in `data.ts`; layout in `App.tsx`. Never touch `main.tsx`, `index.html`, `vite.config.ts` or anything under `src/`.
+3. Replace `App.tsx` and `data.ts` with `write_file` (fresh scaffolds, no read needed; if the tool refuses as stale, delete the file via `terminal` and write again). Content and numbers live in `data.ts`; layout in `App.tsx`. Never touch `main.tsx`, `index.html`, `vite.config.ts` or anything under `src/`.
 4. `build <name> --out <final absolute path>`. If `FAIL`, fix the listed lines and rebuild; do not guess at things the error does not mention.
 5. Inspect the screenshot with `vision_analyze` (for decks, open 2 or 3 slide PNGs). Run the checklist below. Fix, rebuild.
 6. Report: final path, size, what it contains, what was verified. Nothing else.
@@ -68,7 +68,7 @@ Output contract: first stdout line starts with `OK` or `FAIL`. `FAIL tsc` is fol
 7. Content language matches the user (pt-BR by default for this user).
 
 ## Pitfalls
-- `init` refuses to overwrite; `--force` replaces App.tsx and data.ts only.
+- `init` refuses to overwrite; `--force` replaces App.tsx and data.ts only. `tsc` is scoped to the artifact being built, so other artifacts never break your build.
 - Tailwind classes must be literal strings in TSX. Dynamic class names built at runtime (`"col-span-" + n`) are not generated; use the `Cell span={n}` helper or inline `style`.
 - Images: only `data:` URLs or files imported from the artifact folder end up inlined. Remote URLs break the offline promise.
 - `recharts` needs a sized parent: `Chart` sets height; do not put it in a zero-height flex child.
