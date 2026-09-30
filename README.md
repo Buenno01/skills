@@ -16,3 +16,10 @@ Manual use of the CLI:
     node artifact-build/scripts/artifact.mjs build demo --out /abs/path/demo.html
 
 Themes live in `artifact-build/templates/kit/src/tokens/*.css`. Add a file there, rerun `setup`, and `--theme <name>` works.
+
+## checkout-sentry pack
+
+Claude Code skills for the Checkout Sentry reports. Copy each folder into `.claude/skills/` of the project.
+
+- `coletar-checkouts-sentry`: collects the full checkouts JSON through the user's authenticated Chrome.
+- `gerar-relatorio-checkout-sentry-json`: computes KPIs from that JSON export; the delivery format is up to the agent.
