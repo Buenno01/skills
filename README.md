@@ -21,5 +21,6 @@ Themes live in `artifact-build/templates/kit/src/tokens/*.css`. Add a file there
 
 Claude Code skills for the Checkout Sentry reports. Copy each folder into `.claude/skills/` of the project.
 
-- `coletar-checkouts-sentry`: collects the full checkouts JSON through the user's authenticated Chrome.
-- `gerar-relatorio-checkout-sentry-json`: computes KPIs from that JSON export; the delivery format is up to the agent.
+- `checkout-sentry-collect-from-browser`: collects the full checkouts JSON through the user's authenticated Chrome; the browser downloads the file.
+- `checkout-sentry-data-extract`: computes the numbers from the CSV export or the collected JSON, crossed with the Shopify customers export. Single entry point `scripts/extract.py` routes to the CSV or JSON flow.
+- `checkout-sentry-generate-report`: builds the Raio-X do checkout page from a component kit, with a suggested full-report composition and a gallery of charts and tables.
